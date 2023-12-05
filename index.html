@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multijuego</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden; /* Evitar desplazamiento */
+            background: linear-gradient(to bottom right, #3498db, #2c3e50); /* Fondo degradado azul */
+            color: #fff;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            margin-bottom: -70px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .game-container {
+            text-align: center;
+        }
+
+        .game-button {
+            background: linear-gradient(to bottom, #27ae60, #219d54); /* Fondo degradado verde */
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1.2em;
+            margin: 20px;
+            
+            cursor: pointer;
+            border-radius: 5px;
+            overflow: hidden; /* Para recortar la imagen dentro del botón */
+            transition: background 0.3s ease;
+        }
+
+        .game-button:hover {
+            background: linear-gradient(to bottom, #219d54, #1d8e4f); /* Cambio de color al pasar el ratón */
+        }
+
+        .game-button img {
+            width: 100%; /* Para asegurar que la imagen ocupe el 100% del botón */
+            height: auto; /* Para mantener la proporción original de la imagen */
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                flex-direction: column;
+            }
+
+            .game-button {
+                margin: 10px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Multijuegos</h1>
+        <h3>Compite con los mejores del mundo y sé el mejor</h3>
+    </header>
+
+    <main>
+        <section class="game-container">
+            <a href="index2.html" class="game-button">
+                <img src="flapygoku.jpeg" alt="Juego 1">
+            </a>
+
+            <a href="https://bhernandezdamian.github.io/juegoprueba1/" class="game-button">
+                <img src="flapybird.png" alt="Juego 2">
+            </a>
+        </section>
+    </main>
+
+</body>
+</html>

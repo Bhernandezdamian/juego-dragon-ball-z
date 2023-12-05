@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego del Asteroide Azul Mejorado</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: url('https://i.makeagif.com/media/7-24-2019/-_tmui.gif') no-repeat center center fixed;
+            background-size: cover;
+            max-width: 100%;
+            height: auto;
+        }
+
+
+        #admobBanner {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #f2f2f2;
+            text-align: center;
+          }
+
+
+
+        
+        #nameEntryContainer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #fff;
+        }
+        
+        #nameInput {
+            margin-bottom: 10px;
+        }
+        
+        #startButton {
+            padding: 10px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        #gameContainer {
+            display: none;
+        }
+        
+        canvas {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        #gameOverMessage {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            padding: 20px;
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 5px;
+        }
+        
+        #score {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            font-size: 18px;
+        }
+        
+        #restartButton {
+            position: fixed;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            padding: 10px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        #verPuntuaciones {
+            position: fixed;
+            top: 80%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+
+
+        /* Agrega estos estilos al final de tu sección de estilos CSS */
+
+
+        
+        /* ... Otros estilos CSS aquí ... */
+    </style>
+</head>
+<body>
+    <div id="nameEntryContainer">
+        <label for="nameInput">Ingrese su nombre:</label>
+        <input type="text" id="nameInput">
+        <button id="startButton">Comenzar Juego</button>
+    </div>
+
+    <div id="gameContainer">
+        <audio id="backgroundMusic" loop>
+            <source src="dragonball.mp3" type="audio/mp3">
+            Tu navegador no soporta el elemento de audio.
+        </audio>
+
+        <img id="ballImage" src="goku.png" style="display: none;">
+        <img id="asteroidImage1" src="cell.jpeg" style="display: none;">
+        <img id="asteroidImage2" src="frezeer.jpeg" style="display: none;">
+        <img id="asteroidImage3" src="mayinbu.jpeg" style="display: none;">
+        <img id="asteroidImage4" src="broly.jpeg" style="display: none;">
+        <img id="asteroidImage5" src="vegueta.png" style="display: none;">
+        <img id="asteroidImage6" src="janemba.png" style="display: none;">
+        <img id="asteroidImage7" src="baby.png" style="display: none;">
+        <img id="asteroidImage8" src="blak.jpeg" style="display: none;">
+        <img id="asteroidImage9" src="drguero.jpeg" style="display: none;">
+        <img id="asteroidImage10" src="nappa.jpeg" style="display: none;">
+        <img id="asteroidImage11" src="raditz.jpeg" style="display: none;">
+        <img id="asteroidImage12" src="dabura.jpeg" style="display: none;">
+        <img id="asteroidImage13" src="cooler.jpeg" style="display: none;">
+        <img id="asteroidImage14" src="cumber.jpeg" style="display: none;">
+        <img id="asteroidImage15" src="ginyu.jpeg" style="display: none;">
+
+        
+
+
+        <canvas id="miCanvas"></canvas>
+        <div id="gameOverMessage">Juego Terminado</div>
+        <div id="score">Puntuación: 0</div>
+        <button id="restartButton" style="display: none;">Reiniciar Juego</button>
+        <button id="verPuntuaciones" style="display: none;">Ver Puntuaciones</button>
+    </div>
+
+    <div id="admobBanner"></div>
+    
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var backgroundMusic = document.getElementById("backgroundMusic");
+            backgroundMusic.volume = 0.5;
+        
+            document.addEventListener("click", function () {
+                if (backgroundMusic.paused) {
+                    backgroundMusic.play();
+                }
+            });
+        
+            const firebaseConfig = {
+                apiKey: "AIzaSyDoBq7thM8Fb0N6r66o-h7jpUMCluRM5GU",
+                authDomain: "juego-dragon-ball-1456c.firebaseapp.com",
+                databaseURL: "https://juego-dragon-ball-1456c-default-rtdb.firebaseio.com",
+                projectId: "juego-dragon-ball-1456c",
+                storageBucket: "juego-dragon-ball-1456c.appspot.com",
+                messagingSenderId: "391974269317",
+                appId: "1:391974269317:web:fe8409f08adea54563d4ec"
+              };
+        
+            firebase.initializeApp(firebaseConfig);
+        
+            var nameEntryContainer = document.getElementById("nameEntryContainer");
+            var gameContainer = document.getElementById("gameContainer");
+            var startButton = document.getElementById("startButton");
+            var nameInput = document.getElementById("nameInput");
+        
+            startButton.addEventListener("click", function () {
+                const userName = nameInput.value.trim();
+                if (userName !== "") {
+                    nameEntryContainer.style.display = "none";
+                    gameContainer.style.display = "block";
+                    startGame(userName);
+                }
+            });
+        
+            function startGame(userName) {
+                var canvas = document.getElementById("miCanvas");
+                var ctx = canvas.getContext("2d");
+        
+                function resizeCanvas() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                }
+        
+                window.addEventListener('resize', resizeCanvas);
+                resizeCanvas();
+        
+                var ball = {
+                    x: canvas.width / 4,
+                    y: canvas.height / 2,
+                    width: 55,
+                    height: 55,
+                    jumpStrength: 7,
+                    gravity: 0.6,
+                    velocity: 0,
+                    image: document.getElementById("ballImage")
+                };
+        
+                var asteroids = [];
+                var asteroidImages = [
+                    document.getElementById("asteroidImage1"),
+                    document.getElementById("asteroidImage2"),
+                    document.getElementById("asteroidImage3"),
+                    document.getElementById("asteroidImage4"),
+                    document.getElementById("asteroidImage5"),
+                    document.getElementById("asteroidImage6"),
+                    document.getElementById("asteroidImage7"),
+                    document.getElementById("asteroidImage8"),
+                    document.getElementById("asteroidImage9"),
+                    document.getElementById("asteroidImage10"),
+                    document.getElementById("asteroidImage11"),
+                    document.getElementById("asteroidImage12"),
+                    document.getElementById("asteroidImage13"),
+                    document.getElementById("asteroidImage14"),
+                    document.getElementById("asteroidImage15")
+                ];
+                var currentAsteroidImageIndex = 0;
+                var imageChangeInterval = 4000;
+                var lastImageChangeTime = 0;
+        
+                var gameOver = false;
+                var score = 0;
+                var scoreElement = document.getElementById("score");
+        
+                function drawBall() {
+                    ctx.drawImage(ball.image, ball.x - ball.width / 2, ball.y - ball.height / 2, ball.width, ball.height);
+                }
+        
+                function drawAsteroid(x, y) {
+                    var asteroidImage = asteroidImages[currentAsteroidImageIndex];
+                    ctx.drawImage(asteroidImage, x - 25, y - 25, 50, 50);
+                }
+        
+                function drawGameOverMessage() {
+                    var gameOverMessage = document.getElementById("gameOverMessage");
+                    gameOverMessage.style.display = "block";
+        
+                    var restartButton = document.getElementById("restartButton");
+                    restartButton.style.display = "block";
+        
+                    var verPuntuacionesButton = document.getElementById("verPuntuaciones");
+                    verPuntuacionesButton.style.display = "block"; // Mostrar el botón al finalizar el juego
+                }
+        
+                function updateScore() {
+                    score++;
+                    scoreElement.textContent = "Puntuación: " + score;
+                }
+        
+                function update() {
+                    if (!gameOver) {
+                        ball.y += ball.velocity;
+                        ball.velocity += ball.gravity;
+        
+                        if (ball.y + ball.height / 2 > canvas.height || ball.y - ball.height / 2 < 0) {
+                            drawGameOverMessage();
+                            gameOver = true;
+                            saveScoreToDatabase(userName, score);
+                        }
+        
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        drawBall();
+        
+                        for (var i = 0; i < asteroids.length; i++) {
+                            asteroids[i].x -= 3 + i * 0.0001;
+                            asteroids[i].y += Math.sin(asteroids[i].x * 0.1);
+                            drawAsteroid(asteroids[i].x, asteroids[i].y);
+        
+                            if (collision(ball, asteroids[i])) {
+                                drawGameOverMessage();
+                                gameOver = true;
+                                saveScoreToDatabase(userName, score);
+                            } else if (asteroids[i].x < ball.x && !asteroids[i].passed) {
+                                updateScore();
+                                asteroids[i].passed = true;
+                            }
+                        }
+        
+                        if (Math.random() < 0.02) {
+                            var newAsteroid = {
+                                x: canvas.width,
+                                y: Math.random() * canvas.height,
+                                passed: false
+                            };
+                            asteroids.push(newAsteroid);
+                        }
+        
+                        var currentTime = new Date().getTime();
+                        if (currentTime - lastImageChangeTime > imageChangeInterval) {
+                            currentAsteroidImageIndex = (currentAsteroidImageIndex + 1) % asteroidImages.length;
+                            lastImageChangeTime = currentTime;
+                        }
+        
+                        requestAnimationFrame(update);
+                    }
+                }
+        
+                function jump() {
+                    ball.velocity = -ball.jumpStrength;
+                }
+        
+                function restartGame() {
+                    ball.y = canvas.height / 2;
+                    ball.velocity = 0;
+                    asteroids = [];
+                    gameOver = false;
+                
+                    var gameOverMessage = document.getElementById("gameOverMessage");
+                    gameOverMessage.style.display = "none";
+                
+                    var restartButton = document.getElementById("restartButton");
+                    restartButton.style.display = "none";
+                
+                    var verPuntuacionesButton = document.getElementById("verPuntuaciones");
+                    verPuntuacionesButton.style.display = "none"; // Ocultar el botón "Ver Puntuaciones"
+                
+                    score = 0;
+                    scoreElement.textContent = "Puntuación: " + score;
+                
+                    update();
+                }
+                
+        
+                function collision(obj1, obj2) {
+                    var distance = Math.sqrt((obj1.x - obj2.x) ** 2 + (obj1.y - obj2.y) ** 2);
+                    return distance < obj1.width / 2 + 25;
+                }
+        
+                document.addEventListener("click", jump);
+                document.addEventListener("touchstart", jump);
+        
+                document.getElementById("restartButton").addEventListener("click", restartGame);
+        
+                update();
+            }
+        
+            function saveScoreToDatabase(userName, score) {
+                const database = firebase.database();
+                const userRef = database.ref('usuarios/' + userName);
+        
+                userRef.once('value', function(snapshot) {
+                    const userData = snapshot.val();
+        
+                    if (!userData || score > (userData.puntuacion || 0)) {
+                        userRef.set({
+                            puntuacion: score
+                        });
+                    }
+                });
+            }
+        
+            document.getElementById("verPuntuaciones").addEventListener("click", showLeaderboard);
+        
+            function showLeaderboard() {
+                const database = firebase.database();
+                const usuariosRef = database.ref('usuarios');
+            
+                usuariosRef.orderByChild('puntuacion').limitToLast(10).once('value', function (snapshot) {
+                    const leaderboard = [];
+                    snapshot.forEach(function (childSnapshot) {
+                        const userName = childSnapshot.key;
+                        const score = childSnapshot.val().puntuacion;
+                        leaderboard.push({ userName, score });
+                    });
+            
+                    leaderboard.sort((a, b) => b.score - a.score);
+            
+                    // Crear una cadena con las puntuaciones numeradas
+                    let leaderboardString = "<h1>Top 10 Puntuaciones</h1><ul>";
+                    leaderboard.forEach((entry, index) => {
+                        leaderboardString += `<li>${index + 1}. ${entry.userName}: ${entry.score}</li>`;
+                    });
+                    leaderboardString += "</ul>";
+            
+                    // Crear un contenedor para mostrar el cuadro negro
+                    const leaderboardContainer = document.createElement('div');
+                    leaderboardContainer.innerHTML = leaderboardString;
+                    leaderboardContainer.style.position = 'fixed';
+                    leaderboardContainer.style.top = '0';
+                    leaderboardContainer.style.left = '0';
+                    leaderboardContainer.style.width = '100%';
+                    leaderboardContainer.style.height = '100%';
+                    leaderboardContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                    leaderboardContainer.style.color = '#fff';
+                    leaderboardContainer.style.zIndex = '9999';
+                    leaderboardContainer.style.display = 'flex';
+                    leaderboardContainer.style.flexDirection = 'column';
+                    leaderboardContainer.style.alignItems = 'center';
+                    leaderboardContainer.style.justifyContent = 'center';
+            
+                    // Crear un botón de cierre
+                    const closeButton = document.createElement('button');
+                    closeButton.innerText = 'Cerrar';
+                    closeButton.style.padding = '10px';
+                    closeButton.style.backgroundColor = '#4caf50';
+                    closeButton.style.color = '#fff';
+                    closeButton.style.border = 'none';
+                    closeButton.style.borderRadius = '5px';
+                    closeButton.style.cursor = 'pointer';
+                    closeButton.addEventListener('click', function () {
+                        document.body.removeChild(leaderboardContainer);
+                    });
+            
+                    // Agregar el botón de cierre al contenedor
+                    leaderboardContainer.appendChild(closeButton);
+            
+                    // Agregar el contenedor al cuerpo del documento
+                    document.body.appendChild(leaderboardContainer);
+                });
+            }
+        });
+        
+    </script>
+    
+</body>
+</html>
